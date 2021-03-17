@@ -1,4 +1,4 @@
-package br.com.drss.skellyproject
+package br.com.drss.pokedex
 
 import android.app.Application
 

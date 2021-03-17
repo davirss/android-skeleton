@@ -37,6 +37,7 @@ dependencies {
     implementation kotlinDependencies.stdlib
     implementation androidx.core
     implementation material.material
+    implementation retrofit.retrofit
     testImplementation junit.junit
     androidTestImplementation androidx.junit
     androidTestImplementation androidx.espresso_core
