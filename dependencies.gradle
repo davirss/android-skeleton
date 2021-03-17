@@ -1,0 +1,24 @@
+ext {
+    kotlinDependencies = [
+            stdlib: "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    ]
+
+    core_version = "1.2.0"
+    androidx_junit_version = "1.1.1"
+    espresso_core_version = "3.2.0"
+    androidx = [
+            core: "androidx.core:core-ktx:$core_version",
+            junit: "androidx.test.ext:junit:$androidx_junit_version",
+            espresso_core: "androidx.test.espresso:espresso-core:$espresso_core_version"
+    ]
+
+    junit_version = "4.13.2"
+    junit = [
+            junit: "junit:junit:$junit_version"
+    ]
+
+    material_version = "1.1.0"
+    material = [
+            material: "com.google.android.material:material:$material_version"
+    ]
+}
