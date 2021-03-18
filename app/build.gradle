@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.30'
 }
 
 android {
@@ -8,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "br.com.drss.skellyproject"
+        applicationId "br.com.drss.pokedex"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
@@ -38,7 +39,9 @@ dependencies {
     implementation androidx.core
     implementation material.material
     implementation retrofit.retrofit
+    implementation koin.koin
     testImplementation junit.junit
     androidTestImplementation androidx.junit
     androidTestImplementation androidx.espresso_core
+
 }
