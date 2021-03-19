@@ -40,6 +40,8 @@ dependencies {
     implementation material.material
     implementation retrofit.retrofit
     implementation koin.koin
+    implementation kotlinx.coroutines_android
+
     testImplementation junit.junit
     androidTestImplementation androidx.junit
     androidTestImplementation androidx.espresso_core
