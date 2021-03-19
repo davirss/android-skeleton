@@ -26,15 +26,20 @@ class PokemonRepositoryImpl(
     @ExperimentalCoroutinesApi
     override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<List<PokemonSummary>> =
         channelFlow {
-            val query = if (typeFilters.isNotEmpty()) pokemonSummaryDao.getTypeFilteredSummaries(typeFilters) else pokemonSummaryDao.getAllSummaries()
+            val query =
+                if (typeFilters.isNotEmpty())
+                    pokemonSummaryDao.getTypeFilteredSummaries(typeFilters)
+                else
+                    pokemonSummaryDao.getAllSummaries()
 
             query.collect {
-                if (it.isEmpty()) {
+                if (it.isNotEmpty()) {
                     offer(it)
                 } else {
                     pokemonApi.getPokemonPagedList().results
                         .map { getPokemonSummary(it.name) }
-                        .filter { it.types.intersect(typeFilters).isNotEmpty() }
+                        .filter { typeFilters.isEmpty() || it.types.intersect(typeFilters).isNotEmpty() }
+                        .run { offer(this) }
                 }
             }
         }
@@ -65,7 +70,7 @@ internal fun PokemonDto.toSummary(): PokemonSummary {
     return PokemonSummary(
         this.name,
         this.id,
-        this.types.map { PokemonType(it.name) },
-        this.sprites.frontDefault
+        this.sprites.frontDefault,
+        this.types.map { PokemonType(it.name) }
     )
 }

@@ -4,7 +4,6 @@ import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
 import br.com.drss.pokedex.home.repository.database.PokemonSummaryDao
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonTypeFilter
 import br.com.drss.pokedex.home.repository.network.PokeApi
 import br.com.drss.pokedex.home.repository.network.dto.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,8 +25,8 @@ class PokemonRepositoryTest {
             emit(inMemoryDb)
         }
 
-        override fun getTypeFilteredSummaries(typeFilterList: List<PokemonType>): Flow<List<PokemonSummary>> = flow {
-            emit(inMemoryDb.filter { it.types.intersect(typeFilterList).isNotEmpty() })
+        override fun getTypeFilteredSummaries(filter: List<PokemonType>): Flow<List<PokemonSummary>> = flow {
+            emit(inMemoryDb.filter { it.types.intersect(filter).isNotEmpty() })
         }
 
         override suspend fun findByName(name: String): PokemonSummary? {
@@ -39,10 +38,10 @@ class PokemonRepositoryTest {
         }
     }
 
-    class FakePokeApi(val data: List<PokemonDto>) : PokeApi {
+    class FakePokeApi(private val data: List<PokemonDto>) : PokeApi {
 
         override suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto> {
-            return PagedListResponse<PagedPokemonDto>(
+            return PagedListResponse(
                 count = data.size,
                 results = data.map { PagedPokemonDto(it.name) }
             )
@@ -69,8 +68,8 @@ class PokemonRepositoryTest {
             val expectedPokemonSummary = PokemonSummary(
                 "bulbasaur",
                 1,
-                listOf(PokemonType("grass"), PokemonType("poison")),
-                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+                listOf("grass","poison")
             )
             assert(pokemonSummaryList[0].first() == expectedPokemonSummary)
         }
@@ -105,7 +104,7 @@ class PokemonRepositoryTest {
             val pokemonRepository = PokemonRepositoryImpl(FakePokemonSummaryDao(), FakePokeApi(pokemonList))
             val pokemonSummaryList = pokemonRepository.getPokemonSummaryList(listOf(poisonPokemonType)).toList()
 
-            val results = pokemonSummaryList[0].filter { !it.types.contains(PokemonType("poison")) }
+            val results = pokemonSummaryList[0].filter { !it.types.contains("poison") }
             assert(results.isEmpty())
         }
 }
@@ -113,8 +112,8 @@ class PokemonRepositoryTest {
 val bulbasaur_summary = PokemonSummary(
     "bulbasaur",
     1,
-    listOf(PokemonType("grass"), PokemonType("poison")),
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    listOf("grass", "poison")
 )
 
 val pokemonList = listOf<PokemonDto>(
