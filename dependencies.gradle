@@ -7,16 +7,21 @@ ext {
     serialization_version = "1.1.0"
     kotlinx = [
             coroutines_android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_android_version",
-            serialization: "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+            serialization     : "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
     ]
 
     core_version = "1.2.0"
     androidx_junit_version = "1.1.1"
     espresso_core_version = "3.2.0"
+    vm_ktx_version = "2.2.0"
     androidx = [
-            core         : "androidx.core:core-ktx:$core_version",
-            junit        : "androidx.test.ext:junit:$androidx_junit_version",
-            espresso_core: "androidx.test.espresso:espresso-core:$espresso_core_version"
+            core: "androidx.core:core-ktx:$core_version",
+            vm_ktx: "androidx.lifecycle:lifecycle-viewmodel-ktx:$vm_ktx_version",
+            test: [
+                    junit        : "androidx.test.ext:junit:$androidx_junit_version",
+                    espresso_core: "androidx.test.espresso:espresso-core:$espresso_core_version",
+            ]
+
     ]
 
     junit_version = "4.13.2"
@@ -40,9 +45,9 @@ ext {
     ]
 
     room_version = "2.2.6"
-    room  = [
+    room = [
             runtime: "androidx.room:room-runtime:$room_version",
-            ktx: "androidx.room:room-ktx:$room_version"
+            ktx    : "androidx.room:room-ktx:$room_version"
     ]
     room_kapt = "androidx.room:room-compiler:$room_version"
 

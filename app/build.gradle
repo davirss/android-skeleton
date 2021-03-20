@@ -41,6 +41,7 @@ dependencies {
 
     implementation kotlinDependencies.stdlib
     implementation androidx.core
+    implementation androidx.vm_ktx
     implementation material.material
     implementation retrofit.retrofit
     implementation koin.koin
@@ -50,7 +51,6 @@ dependencies {
     kapt room_kapt
 
     testImplementation junit.junit
-    androidTestImplementation androidx.junit
-    androidTestImplementation androidx.espresso_core
+    androidTestImplementation androidx.test.values()
 
 }

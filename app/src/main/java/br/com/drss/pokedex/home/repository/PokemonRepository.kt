@@ -5,6 +5,8 @@ import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.home.repository.network.PokeApi
 import br.com.drss.pokedex.home.repository.network.dto.PokemonDto
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -16,7 +18,8 @@ interface PokemonRepository {
 
 class PokemonRepositoryImpl(
     private val pokemonSummaryDao: PokemonSummaryDao,
-    private val pokemonApi: PokeApi
+    private val pokemonApi: PokeApi,
+    val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PokemonRepository {
 
     /**
