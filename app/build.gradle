@@ -38,6 +38,17 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        // Kotlinx-coroutines causes an issue with conflicts files regarding licenses.
+        // See this link for more info: https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-debug#debug-agent-and-android
+        // for JNA and JNA-platform
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
+        // for byte-buddy
+        exclude "META-INF/licenses/ASM"
+        pickFirst "win32-x86-64/attach_hotspot_windows.dll"
+        pickFirst "win32-x86/attach_hotspot_windows.dll"
+    }
 }
 
 dependencies {
@@ -58,6 +69,8 @@ dependencies {
     kapt room_kapt
 
     testImplementation junit.junit
+    testImplementation kotlinx.coroutines_test
+
     androidTestImplementation androidx.test.values()
 
 }
