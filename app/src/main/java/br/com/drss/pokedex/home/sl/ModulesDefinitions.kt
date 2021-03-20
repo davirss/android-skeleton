@@ -1,12 +1,14 @@
 package br.com.drss.pokedex.home.sl
 
+import br.com.drss.pokedex.home.repository.PokemonRepository
+import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
 
 val repositoryModule = module {
-    single {
-
+    single<PokemonRepository> {
+        PokemonRepositoryImpl(get(), get())
     }
 }
 

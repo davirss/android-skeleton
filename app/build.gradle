@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.30'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -31,6 +32,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    lintOptions {
+        warningsAsErrors true
+    }
 }
 
 dependencies {
@@ -40,7 +44,10 @@ dependencies {
     implementation material.material
     implementation retrofit.retrofit
     implementation koin.koin
-    implementation kotlinx.coroutines_android
+    implementation kotlinx.values()
+    implementation room.values()
+
+    kapt room_kapt
 
     testImplementation junit.junit
     androidTestImplementation androidx.junit
