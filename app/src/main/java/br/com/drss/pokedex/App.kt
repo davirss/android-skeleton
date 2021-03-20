@@ -4,6 +4,7 @@ import android.app.Application
 import br.com.drss.pokedex.di.applicationModule
 import br.com.drss.pokedex.di.networkModule
 import br.com.drss.pokedex.di.repositoryModule
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class App: Application() {
@@ -15,6 +16,7 @@ class App: Application() {
 
     private fun startKoin() {
         startKoin {
+            androidContext(applicationContext)
             modules(applicationModule, networkModule, repositoryModule)
         }
     }

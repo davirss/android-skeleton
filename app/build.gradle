@@ -48,7 +48,9 @@ dependencies {
     implementation androidx.lifecycle_runtime_ktx
     implementation androidx.constraint_layout
     implementation material.material
-    implementation retrofit.retrofit
+    implementation retrofit.http_interceptor
+    api retrofit.retrofit
+
     implementation koin.koin
     implementation kotlinx.values()
     implementation room.values()

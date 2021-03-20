@@ -8,9 +8,9 @@ import retrofit2.http.Path
 
 interface PokeApi {
 
-    @GET("api/v2/pokemon")
+    @GET("v2/pokemon")
     suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto>
 
-    @GET("api/v2/pokemon/{name}")
+    @GET("v2/pokemon/{name}")
     suspend fun getPokemonData(@Path("name") name: String): PokemonDto
 }

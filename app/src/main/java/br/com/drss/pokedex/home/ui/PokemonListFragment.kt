@@ -44,7 +44,9 @@ class PokemonListFragment: Fragment() {
     }
 
     private fun displayLoadedState(viewState: Loaded) {
-
+        viewState.pokemonSummaryList.forEach {
+            print(it.toString())
+        }
     }
 
 }

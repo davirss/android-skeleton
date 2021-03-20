@@ -44,7 +44,9 @@ class PokemonRepositoryImpl(
                     pokemonApi.getPokemonPagedList().results
                         .map { getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi) }
                         .filter { typeFilters.isEmpty() || it.types.intersect(typeFilters).isNotEmpty() }
-                        .run { offer(this) }
+                        .run {
+                            offer(this)
+                        }
                 }
             }
         }
@@ -78,6 +80,6 @@ internal fun PokemonDto.toSummary(): PokemonSummary {
         this.name,
         this.id,
         this.sprites.frontDefault,
-        this.types.map { PokemonType(it.name) }
+        this.types.map { PokemonType(it.type.name) }
     )
 }
