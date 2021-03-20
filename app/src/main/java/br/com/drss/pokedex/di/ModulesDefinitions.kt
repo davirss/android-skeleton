@@ -1,7 +1,8 @@
-package br.com.drss.pokedex.home.sl
+package br.com.drss.pokedex.di
 
 import br.com.drss.pokedex.home.repository.PokemonRepository
 import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
+import br.com.drss.pokedex.retrofit.buildRetrofitInstance
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
@@ -14,15 +15,10 @@ val repositoryModule = module {
 
 val networkModule = module {
     single {
-        getRetrofit()
+        buildRetrofitInstance()
     }
 }
 
 val applicationModule = module {
 
-}
-
-
-fun getRetrofit(): Retrofit {
-    return Retrofit.Builder().build()
 }
