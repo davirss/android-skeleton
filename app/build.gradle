@@ -35,6 +35,9 @@ android {
     lintOptions {
         warningsAsErrors true
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
