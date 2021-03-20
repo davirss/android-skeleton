@@ -2,6 +2,7 @@ package br.com.drss.pokedex.home.repository.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
@@ -19,6 +20,6 @@ interface PokemonSummaryDao {
     @Query("SELECT * FROM PokemonSummary WHERE name = :name")
     suspend fun findByName(name: String): PokemonSummary?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPokemonSummary(pokemonSummary: PokemonSummary)
 }
