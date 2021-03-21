@@ -1,9 +1,9 @@
 package br.com.drss.pokedex.data
 
-import br.com.drss.pokedex.home.repository.network.dto.PokemonDto
-import br.com.drss.pokedex.home.repository.network.dto.PokemonTypeDto
-import br.com.drss.pokedex.home.repository.network.dto.Sprites
-import br.com.drss.pokedex.home.repository.network.dto.TypeSlot
+import br.com.drss.pokedex.features.home.repository.network.dto.PokemonDto
+import br.com.drss.pokedex.features.home.repository.network.dto.PokemonTypeDto
+import br.com.drss.pokedex.features.home.repository.network.dto.Sprites
+import br.com.drss.pokedex.features.home.repository.network.dto.TypeSlot
 
 val pokemonList = listOf<PokemonDto>(
     PokemonDto(

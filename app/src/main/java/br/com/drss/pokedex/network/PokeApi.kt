@@ -1,8 +1,8 @@
-package br.com.drss.pokedex.home.repository.network
+package br.com.drss.pokedex.network
 
-import br.com.drss.pokedex.home.repository.network.dto.PagedListResponse
-import br.com.drss.pokedex.home.repository.network.dto.PagedPokemonDto
-import br.com.drss.pokedex.home.repository.network.dto.PokemonDto
+import br.com.drss.pokedex.network.dtos.PagedListResponse
+import br.com.drss.pokedex.network.dtos.PagedPokemonDto
+import br.com.drss.pokedex.network.dtos.PokemonDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 

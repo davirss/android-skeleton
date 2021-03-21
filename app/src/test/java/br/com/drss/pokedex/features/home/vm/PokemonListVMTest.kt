@@ -1,11 +1,11 @@
-package br.com.drss.pokedex.home.vm
+package br.com.drss.pokedex.features.home.vm
 
 import br.com.drss.pokedex.data.pokemonList
-import br.com.drss.pokedex.home.repository.*
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
-import br.com.drss.pokedex.home.ui.Initialized
-import br.com.drss.pokedex.home.ui.PokemonListViewModel
+import br.com.drss.pokedex.features.home.repository.*
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
+import br.com.drss.pokedex.features.home.ui.Initialized
+import br.com.drss.pokedex.features.home.ui.PokemonListViewModel
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi

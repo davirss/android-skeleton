@@ -1,8 +1,8 @@
-package br.com.drss.pokedex.home.repo
+package br.com.drss.pokedex.features.home.repo
 
-import br.com.drss.pokedex.home.repository.database.PokemonSummaryDao
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
+import br.com.drss.pokedex.features.home.repository.database.PokemonSummaryDao
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

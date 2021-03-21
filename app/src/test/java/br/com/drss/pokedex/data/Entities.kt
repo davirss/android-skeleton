@@ -1,7 +1,7 @@
 package br.com.drss.pokedex.data
 
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 
 val bulbasaur_summary = PokemonSummary(
     "bulbasaur",

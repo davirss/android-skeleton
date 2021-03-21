@@ -1,13 +1,13 @@
-package br.com.drss.pokedex.home.repo
+package br.com.drss.pokedex.features.home.repo
 
 import br.com.drss.pokedex.data.bulbasaur_summary
 import br.com.drss.pokedex.data.pokemonList
-import br.com.drss.pokedex.home.repository.Loaded
-import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
-import br.com.drss.pokedex.home.repository.network.PokeApi
-import br.com.drss.pokedex.home.repository.network.dto.*
+import br.com.drss.pokedex.features.home.repository.Loaded
+import br.com.drss.pokedex.features.home.repository.PokemonRepositoryImpl
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
+import br.com.drss.pokedex.network.PokeApi
+import br.com.drss.pokedex.features.home.repository.network.dto.*
+import br.com.drss.pokedex.network.dtos.PagedListResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,12 +1,11 @@
-package br.com.drss.pokedex.home.ui
+package br.com.drss.pokedex.features.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.drss.pokedex.home.repository.Loaded
-import br.com.drss.pokedex.home.repository.Loading
-import br.com.drss.pokedex.home.repository.PokemonRepository
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonTypeFilter
+import br.com.drss.pokedex.features.home.repository.Loading
+import br.com.drss.pokedex.features.home.repository.PokemonRepository
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonTypeFilter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

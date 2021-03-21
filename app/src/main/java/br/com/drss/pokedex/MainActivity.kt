@@ -1,6 +1,7 @@
 package br.com.drss.pokedex
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import br.com.drss.pokedex.databinding.ActivityMainBinding
 
@@ -12,6 +13,11 @@ class MainActivity: FragmentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
+
+
+    fun navigateTo(fragment: Fragment) {
+        
     }
 
 }

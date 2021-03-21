@@ -1,4 +1,4 @@
-package br.com.drss.pokedex.home.repository.domain.entities
+package br.com.drss.pokedex.features.home.repository.domain.entities
 
 import androidx.room.*
 import kotlinx.serialization.Serializable

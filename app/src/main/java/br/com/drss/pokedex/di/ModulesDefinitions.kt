@@ -2,15 +2,20 @@ package br.com.drss.pokedex.di
 
 import androidx.room.Room
 import br.com.drss.pokedex.BuildConfig
-import br.com.drss.pokedex.home.repository.PokemonRepository
-import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
-import br.com.drss.pokedex.home.repository.database.Database
-import br.com.drss.pokedex.home.repository.network.PokeApi
-import br.com.drss.pokedex.home.ui.PokemonListViewModel
-import br.com.drss.pokedex.retrofit.provideJsonConverterFactory
-import br.com.drss.pokedex.retrofit.provideOkHttpClient
-import br.com.drss.pokedex.retrofit.provideOkHttpLoggingInterceptor
-import br.com.drss.pokedex.retrofit.provideRetrofitInstance
+import br.com.drss.pokedex.features.details.repo.DetailsRepo
+import br.com.drss.pokedex.features.details.repo.RemoteDetailsRepo
+import br.com.drss.pokedex.features.details.ui.DetailFragment
+import br.com.drss.pokedex.features.details.ui.DetailViewModel
+import br.com.drss.pokedex.features.home.repository.PokemonRepository
+import br.com.drss.pokedex.features.home.repository.PokemonRepositoryImpl
+import br.com.drss.pokedex.features.home.repository.database.Database
+import br.com.drss.pokedex.features.home.ui.PokemonListFragment
+import br.com.drss.pokedex.network.PokeApi
+import br.com.drss.pokedex.features.home.ui.PokemonListViewModel
+import br.com.drss.pokedex.network.retrofit.provideJsonConverterFactory
+import br.com.drss.pokedex.network.retrofit.provideOkHttpClient
+import br.com.drss.pokedex.network.retrofit.provideOkHttpLoggingInterceptor
+import br.com.drss.pokedex.network.retrofit.provideRetrofitInstance
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidApplication
@@ -20,9 +25,6 @@ import retrofit2.Retrofit
 
 
 val repositoryModule = module {
-    single<PokemonRepository> {
-        PokemonRepositoryImpl(get(), get())
-    }
     single<Database> {
         Room.databaseBuilder(androidApplication(), Database::class.java, "pokedex-db").build()
     }
@@ -49,11 +51,25 @@ val networkModule = module {
 
         provideOkHttpClient(interceptions)
     }
-
 }
 
 val applicationModule = module {
-    viewModel {
-        PokemonListViewModel(get())
+
+    scope<PokemonListFragment> {
+        viewModel {
+            PokemonListViewModel(get())
+        }
+        scoped<PokemonRepository> {
+            PokemonRepositoryImpl(get(), get())
+        }
+    }
+
+    scope<DetailFragment> {
+        viewModel {
+            (pokemonName: String ) -> DetailViewModel(pokemonName, get())
+        }
+        scoped<DetailsRepo> {
+            RemoteDetailsRepo(get())
+        }
     }
 }

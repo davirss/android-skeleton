@@ -1,4 +1,4 @@
-package br.com.drss.pokedex.home.ui
+package br.com.drss.pokedex.features.home.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.FragmentPokemonListBinding
 import br.com.drss.pokedex.databinding.ItemSummaryBinding
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
-import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
+import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel

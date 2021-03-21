@@ -1,4 +1,4 @@
-package br.com.drss.pokedex.home.ui
+package br.com.drss.pokedex.features.home.ui
 
 import android.graphics.Rect
 import android.view.View

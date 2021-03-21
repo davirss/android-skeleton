@@ -1,4 +1,4 @@
-package br.com.drss.pokedex.home.repository.network.dto
+package br.com.drss.pokedex.network.dtos
 
 import kotlinx.serialization.Serializable
 
