@@ -6,10 +6,11 @@ import br.com.drss.pokedex.features.home.repository.Loading
 import br.com.drss.pokedex.features.home.repository.PokemonRepository
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonTypeFilter
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class PokemonListViewModel(
     pokemonRepository: PokemonRepository,
@@ -19,6 +20,9 @@ class PokemonListViewModel(
     private val mutableViewState: MutableStateFlow<PokemonListViewState> =
         MutableStateFlow(Initialized(isFetchingItems = true))
     val viewState: StateFlow<PokemonListViewState> = mutableViewState
+
+    private val viewEventsChannel = MutableSharedFlow<PokemonListViewEvents>(replay = 0)
+    val viewEvent = viewEventsChannel
 
     init {
         viewModelScope.launch(dispatcher) {
@@ -33,6 +37,12 @@ class PokemonListViewModel(
                 }
         }
     }
+
+    fun onItemSelected(pokemonSummary: PokemonSummary) {
+        viewModelScope.launch {
+            viewEventsChannel.emit(DisplayDetails(pokemonSummary.name))
+        }
+    }
 }
 
 sealed class PokemonListViewState
@@ -41,5 +51,8 @@ data class Initialized(
     val pokemonSummaryList: List<PokemonSummary> = listOf(),
     val filter: List<PokemonTypeFilter> = listOf()
 ): PokemonListViewState()
+
+sealed class PokemonListViewEvents
+data class DisplayDetails(val name: String): PokemonListViewEvents()
 
 object Error : PokemonListViewState()

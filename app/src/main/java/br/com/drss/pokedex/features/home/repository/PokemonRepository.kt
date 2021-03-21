@@ -4,7 +4,7 @@ import br.com.drss.pokedex.features.home.repository.database.PokemonSummaryDao
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.network.PokeApi
-import br.com.drss.pokedex.features.home.repository.network.dto.PokemonDto
+import br.com.drss.pokedex.network.dtos.PokemonDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 

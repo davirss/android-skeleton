@@ -12,13 +12,13 @@ data class PokemonDto(
     val id: Int,
     val sprites: Sprites,
     val types: List<TypeSlot>,
-    val states: List<StatDto>
+    val stats: List<StatDto>
 )
 
 @Serializable
 data class StatDto(
-    val base_state: Int,
-    val name: StatType
+    val base_stat: Int,
+    val stat: StatType
 )
 
 @Serializable
@@ -40,10 +40,10 @@ data class PokemonTypeDto(
 @Serializable
 data class Sprites(
     @SerialName("front_default") val frontDefault: String,
-    val other: OtherSprites
+    val other: OtherSprites? = null
 )
 
 @Serializable
 data class OtherSprites(
-    @SerialName("official_artwork") val officialArtowkr: Sprites
+    @SerialName("official-artwork") val officialArtwork: Sprites?
 )

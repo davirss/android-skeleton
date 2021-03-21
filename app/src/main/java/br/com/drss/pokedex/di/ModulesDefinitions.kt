@@ -31,6 +31,12 @@ val repositoryModule = module {
     single {
         get<Database>().summaryDao()
     }
+    single<PokemonRepository> {
+        PokemonRepositoryImpl(get(), get())
+    }
+    single<DetailsRepo> {
+        RemoteDetailsRepo(get())
+    }
 }
 
 val networkModule = module {
@@ -54,22 +60,11 @@ val networkModule = module {
 }
 
 val applicationModule = module {
-
-    scope<PokemonListFragment> {
-        viewModel {
-            PokemonListViewModel(get())
-        }
-        scoped<PokemonRepository> {
-            PokemonRepositoryImpl(get(), get())
-        }
+    viewModel {
+        PokemonListViewModel(get())
     }
 
-    scope<DetailFragment> {
-        viewModel {
-            (pokemonName: String ) -> DetailViewModel(pokemonName, get())
-        }
-        scoped<DetailsRepo> {
-            RemoteDetailsRepo(get())
-        }
+    viewModel {
+        (pokemonName: String ) -> DetailViewModel(pokemonName, get())
     }
 }

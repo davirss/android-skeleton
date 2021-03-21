@@ -13,12 +13,13 @@ class RemoteDetailsRepo(private val pokeApi: PokeApi): DetailsRepo {
     override suspend fun getPokemonDetail(name: String): PokemonDetail {
         val pokemon = pokeApi.getPokemonData(name)
         return PokemonDetail(
+            pokemon.id,
             pokemon.name,
             "",
-            pokemon.sprites.other.officialArtowkr.frontDefault,
+            pokemon.sprites.other?.officialArtwork?.frontDefault ?: "",
             pokemon.sprites.frontDefault,
             pokemon.types.map { PokemonType(it.type.name) },
-            pokemon.states.map { Stat(it.name.name, it.base_state) }
+            pokemon.stats.map { Stat(it.stat.name, it.base_stat) }
         )
     }
 
@@ -30,6 +31,7 @@ data class Stat(
 )
 
 data class PokemonDetail(
+    val number: Int,
     val name: String,
     val description: String,
     val artwork: String,
