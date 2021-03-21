@@ -27,7 +27,7 @@ class PokemonListFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenResumed {
             pokemonListViewModel.viewState.collect {
                 renderUi(it)
             }
