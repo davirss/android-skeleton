@@ -102,12 +102,15 @@ class PokemonListFragment : Fragment() {
                 summaryBinding.root
             ) {
             fun bind(pokemonSummary: PokemonSummary) {
-                summaryBinding.idTextView.text = String.format(getString(R.string.pokemon_number), pokemonSummary.number)
-                summaryBinding.pokemonName.text = pokemonSummary.name.capitalize(Locale.getDefault())
-                Glide.with(summaryBinding.frontSprite).load(pokemonSummary.artwork).centerCrop()
-                    .into(
-                        summaryBinding.frontSprite
-                    )
+                summaryBinding.idTextView.text =
+                    String.format(getString(R.string.pokemon_number), pokemonSummary.number)
+                summaryBinding.pokemonName.text =
+                    pokemonSummary.name.capitalize(Locale.getDefault())
+                Glide
+                    .with(summaryBinding.frontSprite)
+                    .load(pokemonSummary.artwork)
+                    .centerCrop()
+                    .into(summaryBinding.frontSprite)
                 summaryBinding.firstSlotTypeImageView.setImageResource(
                     pokemonSummary.types.first().getIconId()
                 )
@@ -134,10 +137,7 @@ class PokemonListFragment : Fragment() {
             holder.bind(getItem(position))
         }
     }
-
-
 }
-
 
 
 class PokemonSummaryDiff : DiffUtil.ItemCallback<PokemonSummary>() {

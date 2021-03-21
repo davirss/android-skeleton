@@ -27,6 +27,7 @@ class MainActivity: FragmentActivity() {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragContainer, detailFragment)
+                    .addToBackStack(detailFragment::class.simpleName)
                     .commit()
             }
             NavigationActions.PopBack -> {

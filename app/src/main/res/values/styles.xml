@@ -7,4 +7,8 @@
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item name="android:textColor">@color/white</item>
     </style>
+    <style name="StatTextView" parent="TypeTextView">
+        <item name="android:background">@drawable/shape_detail_type</item>
+        <item name="backgroundTint">?colorOnBackground</item>
+    </style>
 </resources>

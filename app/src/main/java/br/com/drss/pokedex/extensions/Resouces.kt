@@ -1,5 +1,8 @@
 package br.com.drss.pokedex.extensions
 
+import android.content.Context
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.annotation.IntegerRes
 import androidx.fragment.app.Fragment
 import br.com.drss.pokedex.R
@@ -24,3 +27,12 @@ fun PokemonType.getColorResource(): Int {
 }
 
 fun Fragment.getInteger(@IntegerRes resId: Int) = resources.getInteger(resId)
+
+@ColorInt
+fun Context.getColorFromAttr(@AttrRes attrColor: Int
+): Int {
+    val typedArray = theme.obtainStyledAttributes(intArrayOf(attrColor))
+    val textColor = typedArray.getColor(0, 0)
+    typedArray.recycle()
+    return textColor
+}
