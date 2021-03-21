@@ -1,6 +1,7 @@
 package br.com.drss.pokedex.home.repository.domain.entities
 
 import androidx.room.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,6 +14,7 @@ data class PokemonSummary(
     val types: List<PokemonType>
 )
 
+@Serializable
 @Entity
 data class PokemonType(@PrimaryKey val name: String)
 

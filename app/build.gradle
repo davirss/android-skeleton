@@ -35,14 +35,35 @@ android {
     lintOptions {
         warningsAsErrors true
     }
+    buildFeatures {
+        viewBinding true
+    }
+    packagingOptions {
+        // Kotlinx-coroutines causes an issue with conflicts files regarding licenses.
+        // See this link for more info: https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-debug#debug-agent-and-android
+        // for JNA and JNA-platform
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
+        // for byte-buddy
+        exclude "META-INF/licenses/ASM"
+        pickFirst "win32-x86-64/attach_hotspot_windows.dll"
+        pickFirst "win32-x86/attach_hotspot_windows.dll"
+    }
 }
 
 dependencies {
 
     implementation kotlinDependencies.stdlib
     implementation androidx.core
+    implementation androidx.vm_ktx
+    implementation androidx.lifecycle_runtime_ktx
+    implementation androidx.constraint_layout
     implementation material.material
-    implementation retrofit.retrofit
+    implementation retrofit.http_interceptor
+    implementation glide.glide
+    annotationProcessor glide.annotation_processor
+    api retrofit.retrofit
+
     implementation koin.koin
     implementation kotlinx.values()
     implementation room.values()
@@ -50,7 +71,8 @@ dependencies {
     kapt room_kapt
 
     testImplementation junit.junit
-    androidTestImplementation androidx.junit
-    androidTestImplementation androidx.espresso_core
+    testImplementation kotlinx.coroutines_test
+
+    androidTestImplementation androidx.test.values()
 
 }
