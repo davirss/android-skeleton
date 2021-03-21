@@ -2,6 +2,7 @@ package br.com.drss.pokedex.home.repo
 
 import br.com.drss.pokedex.data.bulbasaur_summary
 import br.com.drss.pokedex.data.pokemonList
+import br.com.drss.pokedex.home.repository.Loaded
 import br.com.drss.pokedex.home.repository.PokemonRepositoryImpl
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.home.repository.domain.entities.PokemonType
@@ -55,15 +56,11 @@ class PokemonRepositoryTest {
                 assertTrue(it.isEmpty())
             }
 
-            val pokemonSummaryList = pokemonRepository.getPokemonSummaryList().toList()
-
-            val expectedPokemonSummary = PokemonSummary(
-                "bulbasaur",
-                1,
-                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-                listOf(PokemonType("grass"),PokemonType("poison"))
-            )
-            assertEquals(pokemonSummaryList[0].first(), expectedPokemonSummary)
+            pokemonRepository.getPokemonSummaryList().collect {
+                if (it is Loaded) {
+                    assertEquals(pokemonList.size, it.finalData.size)
+                }
+            }
         }
 
     @Test
@@ -83,21 +80,26 @@ class PokemonRepositoryTest {
             }
 
             val pokemonRepository = PokemonRepositoryImpl(fakeDao, exceptionRaiserApi)
-            val pokemonSummaryList = pokemonRepository.getPokemonSummaryList().toList()
-
-            assertEquals(pokemonSummaryList[0].first(), bulbasaur_summary)
+            pokemonRepository.getPokemonSummaryList().collect {
+                if (it is Loaded) {
+                    assert(it.data.contains(bulbasaur_summary))
+                }
+            }
         }
 
     @Test
-    fun `Given I have the grass filter selected, When I get the data Then I should see only the filtered results`(): Unit =
+    fun `Given I have the poison filter selected, When I get the data Then I should see only the filtered results`(): Unit =
         runBlocking {
-            val poisonPokemonType = PokemonType("poison")
+            val pokemonTypeList = listOf(PokemonType("poison"))
 
             val pokemonRepository = PokemonRepositoryImpl(InMemorySummaryDao(), FakePokeApi(pokemonList))
-            val pokemonSummaryList = pokemonRepository.getPokemonSummaryList(listOf(poisonPokemonType)).toList()
-
-            val results = pokemonSummaryList[0].filter { !it.types.contains(PokemonType("poison")) }
-            assertTrue(results.isEmpty())
+            pokemonRepository.getPokemonSummaryList(pokemonTypeList).collect {
+                if (it is Loaded) {
+                    it.finalData.forEach {
+                        assert(it.types.intersect(pokemonTypeList).isNotEmpty())
+                    }
+                }
+            }
         }
 }
 

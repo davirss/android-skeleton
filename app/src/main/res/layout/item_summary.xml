@@ -9,6 +9,7 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent">
 
+
     <TextView
         style="@style/TextAppearance.MdcTypographyStyles.Headline6"
         android:id="@+id/pokemonName"
@@ -27,6 +28,7 @@
         android:importantForAccessibility="no"
         android:layout_height="0dp"
         android:layout_width="0dp"
+        android:scaleType="fitXY"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,10 +38,15 @@
 
     <ImageView
         android:id="@+id/firstSlotTypeImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:importantForAccessibility="no"
-        android:layout_height="8dp"
-        android:layout_width="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:paddingTop="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/idTextView"
+        app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/idTextView"
         tools:srcCompat="@tools:sample/avatars" />
@@ -47,11 +54,14 @@
 
     <ImageView
         android:id="@+id/se"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:importantForAccessibility="no"
-        android:layout_height="8dp"
-        android:layout_marginStart="4dp"
-        android:layout_width="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:paddingTop="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/idTextView"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toEndOf="@id/firstSlotTypeImageView"
         app:layout_constraintTop_toTopOf="@+id/idTextView"
         tools:srcCompat="@tools:sample/avatars" />

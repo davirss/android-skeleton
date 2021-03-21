@@ -9,17 +9,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import java.lang.Exception
 
 interface PokemonRepository {
 
-    fun getPokemonSummaryList(typeFilters: List<PokemonType> = listOf()): Flow<List<PokemonSummary>>
+    fun getPokemonSummaryList(typeFilters: List<PokemonType> = listOf()): Flow<OperationStatus<List<PokemonSummary>>>
 
 }
 
 class PokemonRepositoryImpl(
     private val pokemonSummaryDao: PokemonSummaryDao,
-    private val pokemonApi: PokeApi,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val pokemonApi: PokeApi
 ) : PokemonRepository {
 
     /**
@@ -29,25 +29,27 @@ class PokemonRepositoryImpl(
      * @return [Flow] containing the [List] of [PokemonSummary].
      */
     @ExperimentalCoroutinesApi
-    override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<List<PokemonSummary>> =
-        channelFlow {
+    override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<OperationStatus<List<PokemonSummary>>> =
+        flow {
             val query =
                 if (typeFilters.isNotEmpty())
                     pokemonSummaryDao.getTypeFilteredSummaries(typeFilters)
                 else
                     pokemonSummaryDao.getAllSummaries()
 
-            query.collect {
-                if (it.isNotEmpty()) {
-                    offer(it)
-                } else {
+            query.collect { list ->
+                val intermediaryList = list.toMutableList()
+                if (list.isEmpty())
                     pokemonApi.getPokemonPagedList().results
-                        .map { getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi) }
-                        .filter { typeFilters.isEmpty() || it.types.intersect(typeFilters).isNotEmpty() }
-                        .run {
-                            offer(this)
+                        .map {
+                            val summary = getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
+                            if (typeFilters.isEmpty() || summary.types.intersect(typeFilters).isNotEmpty()) {
+                                intermediaryList.add(summary)
+                                emit(Loading(intermediaryList.toList()))
+                            }
                         }
-                }
+
+                emit(Loaded(intermediaryList.toList()))
             }
         }
 
@@ -63,7 +65,11 @@ class PokemonRepositoryImpl(
      *
      * @return [PokemonSummary]
      */
-    private suspend fun getPokemonSummary(name: String, localSource: PokemonSummaryDao, remoteSource: PokeApi): PokemonSummary {
+    private suspend fun getPokemonSummary(
+        name: String,
+        localSource: PokemonSummaryDao,
+        remoteSource: PokeApi
+    ): PokemonSummary {
         localSource.findByName(name)?.let {
             return it
         }
@@ -74,6 +80,10 @@ class PokemonRepositoryImpl(
         return pokemonSummary
     }
 }
+
+sealed class OperationStatus<T>(val data: T)
+data class Loading<T>(val intermediaryData: T): OperationStatus<T>(intermediaryData)
+data class Loaded<T>(val finalData: T): OperationStatus<T>(finalData)
 
 internal fun PokemonDto.toSummary(): PokemonSummary {
     return PokemonSummary(

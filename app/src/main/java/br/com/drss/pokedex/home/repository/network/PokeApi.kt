@@ -8,7 +8,7 @@ import retrofit2.http.Path
 
 interface PokeApi {
 
-    @GET("v2/pokemon")
+    @GET("v2/pokemon?limit=200")
     suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto>
 
     @GET("v2/pokemon/{name}")
