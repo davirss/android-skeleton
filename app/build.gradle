@@ -60,6 +60,8 @@ dependencies {
     implementation androidx.constraint_layout
     implementation material.material
     implementation retrofit.http_interceptor
+    implementation glide.glide
+    annotationProcessor glide.annotation_processor
     api retrofit.retrofit
 
     implementation koin.koin
