@@ -1,9 +1,5 @@
 package br.com.drss.pokedex.features.details.ui
 
-import android.animation.ValueAnimator
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,27 +7,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.FragmentPokemonDetailBinding
-import br.com.drss.pokedex.databinding.ItemStatBinding
 import br.com.drss.pokedex.extensions.getColorResource
 import br.com.drss.pokedex.extensions.getIconId
-import br.com.drss.pokedex.features.details.repo.Stat
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
@@ -50,8 +36,7 @@ class DetailFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentPokemonDetailBinding
-
-    val statsAdapter = StatListAdapter()
+    private val statsAdapter = StatListAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,35 +88,7 @@ class DetailFragment : Fragment() {
 
                 Glide.with(this)
                     .load(it.pokemonDetail.artwork)
-                    .addListener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            resource?.let {
-                                Palette.Builder(it.toBitmap()).generate {
-                                    it?.lightVibrantSwatch?.let {
-                                        binding.root.setBackgroundColor(it.rgb)
-                                        binding.pokemonNumber.setTextColor(it.titleTextColor)
-                                    }
-                                }
-                            }
-                            return false
-                        }
-
-                    })
+                    .addListener(GlidePaletteGeneratorListener(::updateViewsPalette))
                     .into(
                         binding.pokemonArtwork
                     )
@@ -143,6 +100,17 @@ class DetailFragment : Fragment() {
                 statsAdapter.submitList(it.pokemonDetail.states)
 
             }
+            Loading -> {
+
+            }
+        }
+    }
+
+    private fun updateViewsPalette(palette: Palette) {
+        palette.lightVibrantSwatch?.let {
+            binding.root.setBackgroundColor(it.rgb)
+            binding.pokemonNumber.setTextColor(it.titleTextColor)
+
         }
     }
 
@@ -155,43 +123,4 @@ class DetailFragment : Fragment() {
             null
         )
     }
-}
-
-class StatListAdapter : ListAdapter<Stat, StatListAdapter.StatViewHolder>(PokemonStatDiff()) {
-    inner class StatViewHolder(private val itemStatBinding: ItemStatBinding) :
-        RecyclerView.ViewHolder(itemStatBinding.statLabel) {
-
-        fun bind(state: Stat) {
-            itemStatBinding.statLabel.apply {
-                val upperCasedName = context.resources.getString(R.string.stat_label)
-                text = String.format(
-                    upperCasedName,
-                    state.name.toUpperCase(Locale.getDefault()),
-                    state.value
-                )
-            }
-        }
-
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StatViewHolder {
-        val itemStatView =
-            ItemStatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return StatViewHolder(itemStatView)
-    }
-
-    override fun onBindViewHolder(holder: StatViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
-}
-
-class PokemonStatDiff : DiffUtil.ItemCallback<Stat>() {
-    override fun areItemsTheSame(oldItem: Stat, newItem: Stat): Boolean {
-        return oldItem.name == newItem.name
-    }
-
-    override fun areContentsTheSame(oldItem: Stat, newItem: Stat): Boolean {
-        return oldItem.value == oldItem.value
-    }
-
 }

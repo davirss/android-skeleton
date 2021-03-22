@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorOnBackground">
+    android:background="?colorSurface">
 
     <ImageView
         android:id="@+id/pokemonArtwork"
@@ -28,6 +28,7 @@
         android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView"
         app:layout_constraintStart_toStartOf="parent"
+        android:textColor="?colorOnSurface"
         tools:text="#001" />
 
     <TextView
