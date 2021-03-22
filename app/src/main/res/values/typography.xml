@@ -33,6 +33,7 @@
 
     <style name="TextAppearance.MdcTypographyStyles.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="fontFamily">@font/nunito</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/nunito</item>
         <item name="android:textSize">21sp</item>
     </style>
@@ -40,6 +41,7 @@
     <style name="TextAppearance.MdcTypographyStyles.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="fontFamily">@font/nunito</item>
         <item name="android:fontFamily">@font/nunito</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textSize">17sp</item>
     </style>
 

@@ -5,7 +5,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragContainer"
-        android:name="br.com.drss.pokedex.home.ui.PokemonListFragment"
+        android:name="br.com.drss.pokedex.features.home.ui.PokemonListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
