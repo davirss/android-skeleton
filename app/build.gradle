@@ -67,7 +67,10 @@ dependencies {
     api retrofit.retrofit
 
     implementation koin.koin
-    implementation kotlinx.values()
+    implementation kotlinx.coroutines_android
+    implementation kotlinx.coroutines_core
+    implementation kotlinx.serialization
+    implementation kotlinx.serialization_converter
     implementation room.values()
 
     kapt room_kapt

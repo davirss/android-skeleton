@@ -5,7 +5,7 @@ import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSumma
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.network.PokeApi
 import br.com.drss.pokedex.network.dtos.PokemonDto
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 interface PokemonRepository {
@@ -16,14 +16,16 @@ interface PokemonRepository {
 
 class PokemonRepositoryImpl(
     private val pokemonSummaryDao: PokemonSummaryDao,
-    private val pokemonApi: PokeApi
+    private val pokemonApi: PokeApi,
+    private val coroutineScope: CoroutineScope,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : PokemonRepository {
 
     /**
      * Returns a flow containing the summary list given the list of filters provided. If no filter was provided, the
      * data will be returned in it's entirety.
      *
-     * @return [Flow] containing the [List] of [PokemonSummary].
+     * @return [Flow] that emits a [OperationStatus] with a [List] of [PokemonSummary].
      */
     @ExperimentalCoroutinesApi
     override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<OperationStatus<List<PokemonSummary>>> =
@@ -34,21 +36,18 @@ class PokemonRepositoryImpl(
                 else
                     pokemonSummaryDao.getAllSummaries()
 
-            query.collect { list ->
-                val intermediaryList = list.toMutableList()
-                if (list.isEmpty())
-                    pokemonApi.getPokemonPagedList().results
-                        .map {
-                            val summary = getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
-                            if (typeFilters.isEmpty() || summary.types.intersect(typeFilters).isNotEmpty()) {
-                                intermediaryList.add(summary)
-                                emit(Loading(intermediaryList.toList()))
-                            }
-                        }
-
-                emit(Loaded(intermediaryList.toList()))
+            val deferred = coroutineScope.async {
+                pokemonApi.getPokemonPagedList().results.map {
+                    getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
+                }
             }
-        }
+
+            query.collect { list ->
+                val sortedList = list.sortedBy { it.number }
+                emit(if (deferred.isActive) Loading(sortedList) else Loaded(sortedList))
+            }
+        }.flowOn(coroutineDispatcher)
+
 
     /**
      * Returns the Pokemon Summary given the [name] provided.
@@ -79,8 +78,8 @@ class PokemonRepositoryImpl(
 }
 
 sealed class OperationStatus<T>(val data: T)
-data class Loading<T>(val intermediaryData: T): OperationStatus<T>(intermediaryData)
-data class Loaded<T>(val finalData: T): OperationStatus<T>(finalData)
+data class Loading<T>(val intermediaryData: T) : OperationStatus<T>(intermediaryData)
+data class Loaded<T>(val finalData: T) : OperationStatus<T>(finalData)
 
 internal fun PokemonDto.toSummary(): PokemonSummary {
     return PokemonSummary(

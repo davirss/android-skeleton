@@ -4,4 +4,5 @@
     <string name="stat_label">%1$s:%2$d</string>
     <string name="type">Type</string>
     <string name="stats">Stats</string>
+    <string name="network.error">Something went wrong when fetching data.</string>
 </resources>
