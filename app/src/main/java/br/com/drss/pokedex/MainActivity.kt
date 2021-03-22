@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import br.com.drss.pokedex.databinding.ActivityMainBinding
 import br.com.drss.pokedex.features.details.ui.DETAIL_NAME_ARGUMENT
 import br.com.drss.pokedex.features.details.ui.DetailFragment
@@ -13,11 +14,34 @@ class MainActivity: FragmentActivity() {
 
     lateinit var binding: ActivityMainBinding
 
+    val navigator = Navigator(supportFragmentManager)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
+
+    fun navigateTo(navigationActions: NavigationActions) {
+        when(navigationActions) {
+            is NavigationActions.DisplayPokeDetails -> {
+                val detailFragment = DetailFragment()
+                detailFragment.arguments = bundleOf(DETAIL_NAME_ARGUMENT to navigationActions.name)
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragContainer, detailFragment)
+                    .addToBackStack(detailFragment::class.simpleName)
+                    .commit()
+            }
+            NavigationActions.PopBack -> {
+                supportFragmentManager
+                    .popBackStack()
+            }
+        }
+    }
+}
+
+class Navigator(private val supportFragmentManager: FragmentManager) {
 
     fun navigateTo(navigationActions: NavigationActions) {
         when(navigationActions) {

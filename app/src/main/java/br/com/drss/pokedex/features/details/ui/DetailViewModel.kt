@@ -3,7 +3,7 @@ package br.com.drss.pokedex.features.details.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.drss.pokedex.features.details.repo.DetailsRepo
-import br.com.drss.pokedex.features.details.repo.PokemonDetail
+import br.com.drss.pokedex.features.details.repo.entities.PokemonDetail
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

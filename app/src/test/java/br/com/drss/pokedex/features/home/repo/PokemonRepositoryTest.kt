@@ -6,13 +6,15 @@ import br.com.drss.pokedex.features.home.repository.Loaded
 import br.com.drss.pokedex.features.home.repository.PokemonRepositoryImpl
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.network.PokeApi
-import br.com.drss.pokedex.features.home.repository.network.dto.*
 import br.com.drss.pokedex.network.dtos.PagedListResponse
+import br.com.drss.pokedex.network.dtos.PagedPokemonDto
+import br.com.drss.pokedex.network.dtos.PokemonDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -20,6 +22,8 @@ import org.junit.runners.JUnit4
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
 class PokemonRepositoryTest {
+
+    private val coroutineTestScope = TestCoroutineScope()
 
     class FakePokeApi(private val availableData: List<PokemonDto> = pokemonList) : PokeApi {
 
@@ -38,7 +42,7 @@ class PokemonRepositoryTest {
     fun `Given the Repository is just initialized Then it should not fetch any data`() = runBlocking {
         val inMemorySummaryDao = InMemorySummaryDao()
 
-        PokemonRepositoryImpl(inMemorySummaryDao, FakePokeApi(pokemonList))
+        PokemonRepositoryImpl(inMemorySummaryDao, FakePokeApi(pokemonList), coroutineTestScope)
 
         inMemorySummaryDao.getAllSummaries().collect {
             assertTrue(it.isEmpty())
@@ -50,7 +54,7 @@ class PokemonRepositoryTest {
         runBlocking {
             val fakeDao = InMemorySummaryDao()
 
-            val pokemonRepository = PokemonRepositoryImpl(fakeDao, FakePokeApi(pokemonList))
+            val pokemonRepository = PokemonRepositoryImpl(fakeDao, FakePokeApi(pokemonList), coroutineTestScope)
 
             fakeDao.getAllSummaries().collect {
                 assertTrue(it.isEmpty())
@@ -79,7 +83,7 @@ class PokemonRepositoryTest {
                 }
             }
 
-            val pokemonRepository = PokemonRepositoryImpl(fakeDao, exceptionRaiserApi)
+            val pokemonRepository = PokemonRepositoryImpl(fakeDao, exceptionRaiserApi, coroutineTestScope)
             pokemonRepository.getPokemonSummaryList().collect {
                 if (it is Loaded) {
                     assert(it.data.contains(bulbasaur_summary))
@@ -92,7 +96,7 @@ class PokemonRepositoryTest {
         runBlocking {
             val pokemonTypeList = listOf(PokemonType("poison"))
 
-            val pokemonRepository = PokemonRepositoryImpl(InMemorySummaryDao(), FakePokeApi(pokemonList))
+            val pokemonRepository = PokemonRepositoryImpl(InMemorySummaryDao(), FakePokeApi(pokemonList), coroutineTestScope)
             pokemonRepository.getPokemonSummaryList(pokemonTypeList).collect {
                 if (it is Loaded) {
                     it.finalData.forEach {

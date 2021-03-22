@@ -1,5 +1,7 @@
 package br.com.drss.pokedex.features.details.repo
 
+import br.com.drss.pokedex.features.details.repo.entities.PokemonDetail
+import br.com.drss.pokedex.features.details.repo.entities.Stat
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.network.PokeApi
 
@@ -24,18 +26,3 @@ class RemoteDetailsRepo(private val pokeApi: PokeApi): DetailsRepo {
     }
 
 }
-
-data class Stat(
-    val name: String,
-    val value: Int
-)
-
-data class PokemonDetail(
-    val number: Int,
-    val name: String,
-    val description: String,
-    val artwork: String,
-    val frontSprite: String,
-    val types: List<PokemonType>,
-    val states: List<Stat>
-)

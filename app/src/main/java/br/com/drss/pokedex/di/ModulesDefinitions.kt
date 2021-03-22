@@ -16,13 +16,14 @@ import br.com.drss.pokedex.network.retrofit.provideJsonConverterFactory
 import br.com.drss.pokedex.network.retrofit.provideOkHttpClient
 import br.com.drss.pokedex.network.retrofit.provideOkHttpLoggingInterceptor
 import br.com.drss.pokedex.network.retrofit.provideRetrofitInstance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
-
 
 val repositoryModule = module {
     single<Database> {
@@ -32,7 +33,7 @@ val repositoryModule = module {
         get<Database>().summaryDao()
     }
     single<PokemonRepository> {
-        PokemonRepositoryImpl(get(), get())
+        PokemonRepositoryImpl(get(), get(), CoroutineScope(Dispatchers.IO))
     }
     single<DetailsRepo> {
         RemoteDetailsRepo(get())

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.ItemStatBinding
-import br.com.drss.pokedex.features.details.repo.Stat
+import br.com.drss.pokedex.features.details.repo.entities.Stat
 import java.util.*
 
 class StatListAdapter : ListAdapter<Stat, StatListAdapter.StatViewHolder>(PokemonStatDiff()) {
