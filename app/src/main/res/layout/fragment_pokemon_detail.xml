@@ -25,24 +25,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textView"
+        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline5"
+        app:layout_constraintBaseline_toBaselineOf="@+id/detailPokemonName"
         app:layout_constraintStart_toStartOf="parent"
         android:textColor="?colorOnSurface"
         tools:text="#001" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/detailPokemonName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:background="@drawable/shape_test"
+        android:background="@drawable/shape_rounded_left_right_corner"
         android:backgroundTint="?android:colorBackground"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6"
+        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Headline5"
         android:textColor="?colorOnBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/pokemonNumber"
@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView" />
+        app:layout_constraintTop_toBottomOf="@id/detailPokemonName" />
 
     <TextView
         android:id="@+id/description"
@@ -149,5 +149,20 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.2" />
+
+
+    <FrameLayout
+        android:id="@+id/frameContentLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?colorSurface"
+        tools:visibility="gone">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
