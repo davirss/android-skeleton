@@ -59,6 +59,7 @@ dependencies {
     implementation androidx.lifecycle_runtime_ktx
     implementation androidx.constraint_layout
     implementation androidx.pallet
+    implementation androidx.lifecycle_livedata_ktx
     implementation material.material
     implementation retrofit.http_interceptor
     implementation glide.glide

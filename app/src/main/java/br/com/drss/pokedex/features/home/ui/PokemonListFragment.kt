@@ -4,27 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.view.animation.AnimationUtils
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.FragmentPokemonListBinding
 import br.com.drss.pokedex.extensions.getInteger
-import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.ui.adapters.PokemonSummaryListAdapter
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonListFragment : Fragment() {
 
-    private lateinit var job: Job
     private val pokemonListViewModel: PokemonListViewModel by viewModel()
     private lateinit var binding: FragmentPokemonListBinding
     private val pokemonSummaryListAdapter = PokemonSummaryListAdapter {
@@ -33,25 +29,14 @@ class PokemonListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        job = lifecycleScope.launchWhenStarted {
-            pokemonListViewModel.viewEvent.onEach {
-                processEvent(it)
-            }.launchIn(lifecycleScope)
 
-            pokemonListViewModel.viewState.collect {
-                renderUi(it)
-            }
+        pokemonListViewModel.viewState.asLiveData().observe(this) {
+            displayLoadedState(it)
         }
-    }
+        pokemonListViewModel.viewEvent.asLiveData().observe(this) {
+            processEvent(it)
+        }
 
-    override fun onResume() {
-        super.onResume()
-        pokemonListViewModel.loadSummaryList()
-    }
-
-    override fun onStop() {
-        job.cancel()
-        super.onStop()
     }
 
     override fun onCreateView(
@@ -66,6 +51,11 @@ class PokemonListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupToolbar()
+
+        binding.pokemonListScrollToTop.setOnClickListener {
+            pokemonListViewModel.scrollToTop()
+        }
     }
 
     private fun processEvent(event: PokemonListViewEvents) {
@@ -75,7 +65,10 @@ class PokemonListFragment : Fragment() {
                 activity.navigateTo(NavigationActions.DisplayPokeDetails(event.name))
             }
             PokemonListViewEvents.Error -> {
-                Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, R.string.network_error, Snackbar.LENGTH_SHORT).show()
+            }
+            PokemonListViewEvents.ScrollTop -> {
+                binding.recyclerViewPokemonSummary.smoothScrollToPosition(0)
             }
         }
     }
@@ -83,21 +76,53 @@ class PokemonListFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.recyclerViewPokemonSummary.apply {
             val columnCount = getInteger(R.integer.column_count)
+            val gridLayoutManager = GridLayoutManager(requireContext(), columnCount)
             adapter = pokemonSummaryListAdapter
-            layoutManager = GridLayoutManager(requireContext(), columnCount)
+            layoutManager = gridLayoutManager
             addItemDecoration(SpaceItemDecoration(8, columnCount))
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val visibleItemPosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition()
+                    pokemonListViewModel.setFirstVisibleItemPosition(visibleItemPosition)
+                }
+            })
         }
     }
 
-    private fun renderUi(viewState: PokemonListViewState) {
-        when (viewState) {
-            is Initialized -> displayLoadedState(viewState)
-        }
+
+    private fun setupToolbar() {
+        val searchItem = binding.toolbar.menu.findItem(R.id.searchBar)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                pokemonListViewModel.onNameSearch(newText)
+                return true
+            }
+
+        })
     }
 
-    private fun displayLoadedState(viewState: Initialized) {
+    private fun displayLoadedState(viewState: PokemonListViewState) {
         binding.contentLoading.visibility =
             if (viewState.isFetchingItems) View.VISIBLE else View.GONE
+
+        val animationId = if (viewState.scrollToTopVisible) R.anim.anim_grow else R.anim.anim_shrink
+        val growAnimation = AnimationUtils.loadAnimation(requireContext(), animationId)
+        growAnimation.fillBefore = true
+        growAnimation.fillAfter = true
+
+        binding.pokemonListScrollToTop.startAnimation(growAnimation)
+        binding.pokemonListScrollToTop.animate()
+        binding.pokemonListScrollToTop.visibility =
+            if (viewState.scrollToTopVisible) View.VISIBLE else View.GONE
+
         pokemonSummaryListAdapter.submitList(viewState.pokemonSummaryList)
     }
 }

@@ -8,4 +8,6 @@
     <string name="error_missingno">MissignNo.</string>
     <string name="error_message">Something went wrong when retrieving the details of the pokemon.</string>
     <string name="error_unkown_number">#???</string>
+    <string name="search">Search</string>
+    <string name="description_scroll_to_top">Scroll to top</string>
 </resources>

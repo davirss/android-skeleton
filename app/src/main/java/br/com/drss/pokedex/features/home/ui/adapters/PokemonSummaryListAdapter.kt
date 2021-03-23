@@ -1,12 +1,15 @@
 package br.com.drss.pokedex.features.home.ui.adapters
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.ItemSummaryBinding
+import br.com.drss.pokedex.extensions.getColorResource
 import br.com.drss.pokedex.extensions.getIconId
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
@@ -43,12 +46,31 @@ class PokemonSummaryListAdapter(val itemClickAction: (pokemonSummary: PokemonSum
         }
 
         private fun bindTypeSlots(types: List<PokemonType>) {
-            summaryBinding.firstSlotTypeImageView.setImageResource(
-                types.first().getIconId()
-            )
+            summaryBinding.firstSlotTypeImageView.apply {
+                imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        context,
+                        types.first().getColorResource()
+                    )
+                )
+                setImageResource(
+                    types.first().getIconId()
+                )
+            }
 
             if (types.size > 1) {
-                summaryBinding.se.setImageResource(types[1].getIconId())
+                summaryBinding.se.apply {
+                    setImageResource(types[1].getIconId())
+                    imageTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            context,
+                            types[1].getColorResource()
+                        )
+                    )
+                }
+            } else {
+                summaryBinding.se.setImageDrawable(null)
+                summaryBinding.se.imageTintList = null
             }
         }
     }
