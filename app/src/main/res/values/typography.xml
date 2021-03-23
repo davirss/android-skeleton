@@ -35,7 +35,7 @@
         <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/nunito</item>
-        <item name="android:textSize">21sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="TextAppearance.MdcTypographyStyles.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
