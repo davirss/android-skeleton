@@ -7,6 +7,7 @@ import br.com.drss.pokedex.network.PokeApi
 import br.com.drss.pokedex.network.dtos.PokemonDto
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.lang.Exception
 
 interface PokemonRepository {
 
@@ -30,6 +31,7 @@ class PokemonRepositoryImpl(
     @ExperimentalCoroutinesApi
     override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<OperationStatus<List<PokemonSummary>>> =
         flow {
+
             val query =
                 if (typeFilters.isNotEmpty())
                     pokemonSummaryDao.getTypeFilteredSummaries(typeFilters)
@@ -44,7 +46,7 @@ class PokemonRepositoryImpl(
 
             query.collect { list ->
                 val sortedList = list.sortedBy { it.number }
-                emit(if (deferred.isActive) Loading(sortedList) else Loaded(sortedList))
+                emit(if (deferred.isCancelled || deferred.isCompleted) Loaded(sortedList) else Loading(sortedList))
             }
         }.flowOn(coroutineDispatcher)
 

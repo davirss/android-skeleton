@@ -1,17 +1,22 @@
 package br.com.drss.pokedex.features.details.ui
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
+import br.com.drss.pokedex.NavigationManager
 import br.com.drss.pokedex.R
 import br.com.drss.pokedex.databinding.FragmentPokemonDetailBinding
 import br.com.drss.pokedex.extensions.getColorResource
@@ -49,17 +54,29 @@ class DetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                (requireActivity() as MainActivity).navigateTo(NavigationActions.PopBack)
-            }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.navigateBack()
+                }
 
-        })
+            })
         lifecycleScope.launchWhenStarted {
             viewModel.viewState.collect {
                 renderUi(it)
             }
         }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.viewEvent.collect {
+                if (it is DetailViewActions.NavigateBack) popBack()
+            }
+        }
+    }
+
+    private fun popBack() {
+        (requireActivity() as NavigationManager).navigateTo(NavigationActions.PopBack)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,36 +96,76 @@ class DetailFragment : Fragment() {
 
     private fun renderUi(it: DetailViewState) {
         when (it) {
-            is Loaded -> {
-                binding.pokemonNumber.text = String.format(
-                    getString(R.string.pokemon_number),
-                    it.pokemonDetail.number
-                )
-                binding.textView.text = it.pokemonDetail.name.capitalize(Locale.getDefault())
-
-                Glide.with(this)
-                    .load(it.pokemonDetail.artwork)
-                    .addListener(GlidePaletteGeneratorListener(::updateViewsPalette))
-                    .into(
-                        binding.pokemonArtwork
-                    )
-                binding.firstTypeContet.setTypeTextViewContent(it.pokemonDetail.types.first())
-                if (it.pokemonDetail.types.size == 2) binding.secondTypeContent.setTypeTextViewContent(
-                    it.pokemonDetail.types.last()
-                )
-
-                statsAdapter.submitList(it.pokemonDetail.states)
+            is DetailViewState.Loaded -> {
+                displayLoadedContent(it)
 
             }
-            Loading -> {
+            DetailViewState.Loading -> {
+                displayLoading()
+            }
+            DetailViewState.Error -> {
+                displayError()
 
             }
         }
     }
 
+    private fun displayError() {
+        hideLoadingFrame()
+        binding.pokemonNumber.text = getString(R.string.error_unkown_number)
+        binding.detailPokemonName.text = getString(R.string.error_missingno)
+        binding.description.text = getString(R.string.error_message)
+
+        binding.pokemonArtwork.setImageResource(R.drawable.image_error)
+    }
+
+    private fun hideLoadingFrame() {
+        binding.frameContentLoading.animate().alpha(0f).setDuration(200).withEndAction {
+            binding.frameContentLoading.visibility = View.GONE
+        }
+    }
+
+    private fun displayLoading() {
+        hideLoadingFrame()
+        binding.frameContentLoading.visibility = View.VISIBLE
+
+    }
+
+    private fun displayLoadedContent(details: DetailViewState.Loaded) {
+        binding.frameContentLoading.visibility = View.GONE
+        binding.pokemonNumber.text = String.format(
+            getString(R.string.pokemon_number),
+            details.pokemonDetail.number
+        )
+        binding.detailPokemonName.text = details.pokemonDetail.name.capitalize(Locale.getDefault())
+
+        Glide.with(this)
+            .load(details.pokemonDetail.artwork)
+            .addListener(GlidePaletteGeneratorListener(::updateViewsPalette))
+            .into(
+                binding.pokemonArtwork
+            )
+        binding.firstTypeContet.setTypeTextViewContent(details.pokemonDetail.types.first())
+        if (details.pokemonDetail.types.size == 2) binding.secondTypeContent.setTypeTextViewContent(
+            details.pokemonDetail.types.last()
+        )
+
+        statsAdapter.submitList(details.pokemonDetail.states)
+    }
+
     private fun updateViewsPalette(palette: Palette) {
         palette.lightVibrantSwatch?.let {
-            binding.root.setBackgroundColor(it.rgb)
+
+            val typedValue = TypedValue()
+            val theme = requireContext().theme
+            theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
+            @ColorInt val color = typedValue.data
+            val colorAnimation =
+                ValueAnimator.ofObject(ArgbEvaluator(), color, it.rgb)
+            colorAnimation.duration = 200L
+            colorAnimation.addUpdateListener { animator -> binding.root.setBackgroundColor(animator.animatedValue as Int) }
+            colorAnimation.start()
+
             binding.pokemonNumber.setTextColor(it.titleTextColor)
 
         }
