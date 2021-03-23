@@ -5,4 +5,7 @@
     <string name="type">Type</string>
     <string name="stats">Stats</string>
     <string name="network.error">Something went wrong when fetching data.</string>
+    <string name="error_missingno">MissignNo.</string>
+    <string name="error_message">Something went wrong when retrieving the details of the pokemon.</string>
+    <string name="error_unkown_number">#???</string>
 </resources>
