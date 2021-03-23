@@ -7,8 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
+    <color name="red_light_pokedex">#FFFD5B53</color>
+    <color name="red_dark_pokedex">#FF8C0001</color>
     <color name="red_pokedex">#FFB43332</color>
+    <color name="grey_surface_color">#363636</color>
 
 
     <!-- Pokemon Type colors   -->

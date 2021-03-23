@@ -15,7 +15,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name" />
+        app:menu="@menu/menu_list"
+        app:title="@string/app_name" >
+
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPokemonSummary"
@@ -31,14 +34,26 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         tools:listitem="@layout/item_summary" />
 
-    <ProgressBar
-        android:id="@+id/contentLoading"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:contentDescription="@string/description_scroll_to_top"
+        android:id="@+id/pokemonListScrollToTop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_scroll_up"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:backgroundTint="?colorAccent"
+        android:id="@+id/contentLoading"
+        android:indeterminateOnly="true"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
