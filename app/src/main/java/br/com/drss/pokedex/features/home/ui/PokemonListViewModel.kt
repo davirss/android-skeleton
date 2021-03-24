@@ -6,8 +6,10 @@ import br.com.drss.pokedex.features.home.repository.Loading
 import br.com.drss.pokedex.features.home.repository.PokemonRepository
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonTypeFilter
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class PokemonListViewModel(
     private val pokemonRepository: PokemonRepository,
@@ -38,6 +40,7 @@ class PokemonListViewModel(
                     mutableViewState.value = mutableViewState.value.copy(scrollToTopVisible = visibleItem > 0)
                     data
                 }
+                .debounce(500)
                 .combine(searchChannel) { data, filter ->
                     if (filter.isEmpty()) {
                         data.data
@@ -47,6 +50,9 @@ class PokemonListViewModel(
                 }
                 .catch {
                     viewEventsChannel.emit(PokemonListViewEvents.Error)
+                }
+                .onCompletion {
+                    mutableViewState.value = mutableViewState.value.copy(isFetchingItems = false)
                 }
                 .collect {
                     val currentState = mutableViewState.value
@@ -64,19 +70,19 @@ class PokemonListViewModel(
     }
 
     fun onNameSearch(input: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             searchChannel.emit(input ?: "")
         }
     }
 
     fun setFirstVisibleItemPosition(position: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             visibleItemStateFlow.emit(position)
         }
     }
 
     fun scrollToTop() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             viewEventsChannel.emit(PokemonListViewEvents.ScrollTop)
         }
     }

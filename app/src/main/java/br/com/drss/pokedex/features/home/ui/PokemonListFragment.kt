@@ -1,15 +1,19 @@
 package br.com.drss.pokedex.features.home.ui
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Fade
+import androidx.transition.Slide
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
 import br.com.drss.pokedex.R
@@ -21,10 +25,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PokemonListFragment : Fragment() {
 
+    private lateinit var gridLayoutManager: GridLayoutManager
     private val pokemonListViewModel: PokemonListViewModel by viewModel()
     private lateinit var binding: FragmentPokemonListBinding
-    private val pokemonSummaryListAdapter = PokemonSummaryListAdapter {
-        pokemonListViewModel.onItemSelected(it)
+    private val pokemonSummaryListAdapter = PokemonSummaryListAdapter { summary ->
+        pokemonListViewModel.onItemSelected(summary)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +41,6 @@ class PokemonListFragment : Fragment() {
         pokemonListViewModel.viewEvent.asLiveData().observe(this) {
             processEvent(it)
         }
-
     }
 
     override fun onCreateView(
@@ -74,9 +78,10 @@ class PokemonListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        val columnCount = getInteger(R.integer.column_count)
+        gridLayoutManager = GridLayoutManager(requireContext(), columnCount)
+
         binding.recyclerViewPokemonSummary.apply {
-            val columnCount = getInteger(R.integer.column_count)
-            val gridLayoutManager = GridLayoutManager(requireContext(), columnCount)
             adapter = pokemonSummaryListAdapter
             layoutManager = gridLayoutManager
             addItemDecoration(SpaceItemDecoration(8, columnCount))
@@ -113,15 +118,20 @@ class PokemonListFragment : Fragment() {
         binding.contentLoading.visibility =
             if (viewState.isFetchingItems) View.VISIBLE else View.GONE
 
-        val animationId = if (viewState.scrollToTopVisible) R.anim.anim_grow else R.anim.anim_shrink
-        val growAnimation = AnimationUtils.loadAnimation(requireContext(), animationId)
-        growAnimation.fillBefore = true
-        growAnimation.fillAfter = true
+        binding.pokemonListScrollToTop.apply {
+            if (visibility == View.VISIBLE && viewState.scrollToTopVisible) return@apply
 
-        binding.pokemonListScrollToTop.startAnimation(growAnimation)
-        binding.pokemonListScrollToTop.animate()
-        binding.pokemonListScrollToTop.visibility =
-            if (viewState.scrollToTopVisible) View.VISIBLE else View.GONE
+            val animationId = if (viewState.scrollToTopVisible) R.anim.anim_grow else R.anim.anim_shrink
+            val growAnimation = AnimationUtils.loadAnimation(requireContext(), animationId)
+            growAnimation.fillBefore = true
+            growAnimation.fillAfter = true
+
+            startAnimation(growAnimation)
+            animate()
+            visibility =
+                if (viewState.scrollToTopVisible) View.VISIBLE else View.GONE
+
+        }
 
         pokemonSummaryListAdapter.submitList(viewState.pokemonSummaryList)
     }

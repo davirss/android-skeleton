@@ -14,10 +14,14 @@ class RemoteDetailsRepo(private val pokeApi: PokeApi): DetailsRepo {
 
     override suspend fun getPokemonDetail(name: String): PokemonDetail {
         val pokemon = pokeApi.getPokemonData(name)
+        val flavorTexts = pokeApi.getPokemonSpecies(pokemon.name).flavorTextEntries.map {
+            it.flavorText.replace("\n", " ")
+        }
+
         return PokemonDetail(
             pokemon.id,
             pokemon.name,
-            "",
+            flavorTexts.first(),
             pokemon.sprites.other?.officialArtwork?.frontDefault ?: "",
             pokemon.sprites.frontDefault,
             pokemon.types.map { PokemonType(it.type.name) },

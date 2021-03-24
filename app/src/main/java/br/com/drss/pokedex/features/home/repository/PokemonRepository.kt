@@ -1,5 +1,6 @@
 package br.com.drss.pokedex.features.home.repository
 
+import android.util.Log
 import br.com.drss.pokedex.features.home.repository.database.PokemonSummaryDao
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
@@ -38,16 +39,27 @@ class PokemonRepositoryImpl(
                 else
                     pokemonSummaryDao.getAllSummaries()
 
-            val deferred = coroutineScope.async {
-                pokemonApi.getPokemonPagedList().results.map {
-                    getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
+
+            val refreshCall = flow<Boolean> {
+                val pokemonList = pokemonApi.getPokemonPagedList()
+                emit(true)
+                pokemonList.results.map {
+                    try {
+                        getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
+                    } catch (e: Exception) {
+                        Log.d("SUMMARY", "Failed to fetch pokemon")
+                    }
                 }
+                emit(false)
             }
 
-            query.collect { list ->
-                val sortedList = list.sortedBy { it.number }
-                emit(if (deferred.isCancelled || deferred.isCompleted) Loaded(sortedList) else Loading(sortedList))
-            }
+            query
+                .combine(refreshCall.catch { emit(false) }) { list, isLoading ->
+                    if (isLoading) Loading(list) else Loaded(list)
+                }
+                .collect { list ->
+                    emit(list)
+                }
         }.flowOn(coroutineDispatcher)
 
 

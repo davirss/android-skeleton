@@ -4,16 +4,20 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
+import androidx.transition.*
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
 import br.com.drss.pokedex.NavigationManager
@@ -62,17 +66,14 @@ class DetailFragment : Fragment() {
                 }
 
             })
-        lifecycleScope.launchWhenStarted {
-            viewModel.viewState.collect {
-                renderUi(it)
-            }
+        viewModel.viewState.asLiveData().observe(this) {
+            renderUi(it)
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.viewEvent.collect {
-                if (it is DetailViewActions.NavigateBack) popBack()
-            }
+        viewModel.viewEvent.asLiveData().observe(this) {
+            if (it is DetailViewActions.NavigateBack) popBack()
         }
+
     }
 
     private fun popBack() {
@@ -122,22 +123,22 @@ class DetailFragment : Fragment() {
     private fun hideLoadingFrame() {
         binding.frameContentLoading.animate().alpha(0f).setDuration(200).withEndAction {
             binding.frameContentLoading.visibility = View.GONE
-        }
+        }.start()
     }
 
     private fun displayLoading() {
-        hideLoadingFrame()
         binding.frameContentLoading.visibility = View.VISIBLE
 
     }
 
     private fun displayLoadedContent(details: DetailViewState.Loaded) {
-        binding.frameContentLoading.visibility = View.GONE
+        hideLoadingFrame()
         binding.pokemonNumber.text = String.format(
             getString(R.string.pokemon_number),
             details.pokemonDetail.number
         )
         binding.detailPokemonName.text = details.pokemonDetail.name.capitalize(Locale.getDefault())
+        binding.description.text = details.pokemonDetail.description
 
         Glide.with(this)
             .load(details.pokemonDetail.artwork)
