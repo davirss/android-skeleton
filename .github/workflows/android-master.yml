@@ -19,12 +19,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
       - name: Build apk
-        run: bash ./gradlew assembleRelease
+        run: bash ./gradlew assembleDebug
       - name: Uploading artifact
         if: contains(github.ref, 'main')
         uses: actions/upload-artifact@v2
         with:
-          path: app/build/**/release/*.apk
+          path: app/build/**/debug/*.apk
           name: Release Files - Build#${{ github.run_number }}
 
 
