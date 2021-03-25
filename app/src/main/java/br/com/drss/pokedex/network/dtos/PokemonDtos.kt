@@ -47,3 +47,13 @@ data class Sprites(
 data class OtherSprites(
     @SerialName("official-artwork") val officialArtwork: Sprites?
 )
+
+@Serializable
+data class Species(
+    @SerialName("flavor_text_entries") val flavorTextEntries: List<FlavorText>
+)
+
+@Serializable
+data class FlavorText(
+    @SerialName("flavor_text") val flavorText: String
+)
