@@ -2,7 +2,7 @@ package br.com.drss.pokedex.features.home.repo
 
 import br.com.drss.pokedex.data.bulbasaur_summary
 import br.com.drss.pokedex.data.pokemonList
-import br.com.drss.pokedex.features.home.repository.Loaded
+import br.com.drss.pokedex.features.home.repository.OperationStatus
 import br.com.drss.pokedex.features.home.repository.PokemonRepositoryImpl
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.network.PokeApi
@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.lang.Error
 
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
@@ -25,7 +26,7 @@ class PokemonRepositoryTest {
 
     class FakePokeApi(private val availableData: List<PokemonDto> = pokemonList) : PokeApi {
 
-        override suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto> {
+        override suspend fun getPokemonPagedList(limit: Int): PagedListResponse<PagedPokemonDto> {
             return PagedListResponse(
                 count = availableData.size,
                 results = availableData.map { PagedPokemonDto(it.name) }
@@ -40,8 +41,9 @@ class PokemonRepositoryTest {
         }
     }
 
-    val exceptionRaiserApi = object : PokeApi {
-        override suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto> {
+    private val exceptionRaiserApi = object : PokeApi {
+
+        override suspend fun getPokemonPagedList(limit: Int): PagedListResponse<PagedPokemonDto> {
             throw Exception()
         }
 
@@ -79,7 +81,7 @@ class PokemonRepositoryTest {
             }
 
             pokemonRepository.getPokemonSummaryList().collect {
-                if (it is Loaded) {
+                if (it is OperationStatus.Loaded) {
                     assertEquals(pokemonList.size, it.finalData.size)
                 }
             }
@@ -94,8 +96,8 @@ class PokemonRepositoryTest {
             val pokemonRepository =
                 PokemonRepositoryImpl(fakeDao, exceptionRaiserApi, coroutineTestScope)
             pokemonRepository.getPokemonSummaryList().collect {
-                if (it is Loaded) {
-                    assert(it.data.contains(bulbasaur_summary))
+                if (it is OperationStatus.Loaded) {
+                    assert(it.finalData.contains(bulbasaur_summary))
                 }
             }
         }
@@ -111,7 +113,7 @@ class PokemonRepositoryTest {
                 coroutineTestScope
             )
             pokemonRepository.getPokemonSummaryList(pokemonTypeList).collect {
-                if (it is Loaded) {
+                if (it is OperationStatus.Loaded) {
                     it.finalData.forEach {
                         assert(it.types.intersect(pokemonTypeList).isNotEmpty())
                     }
@@ -120,22 +122,15 @@ class PokemonRepositoryTest {
         }
 
     @Test
-    fun `When the network Fails Then I should receive an exception`(): Unit = runBlocking {
+    fun `When the network Fails Then I should receive an Error`(): Unit = runBlocking {
         val repo =
             PokemonRepositoryImpl(InMemorySummaryDao(), exceptionRaiserApi, coroutineTestScope)
 
-        var exceptionRaised = false
-        try {
-            repo.getPokemonSummaryList()
-                .catch {
-                    throw java.lang.Exception()
-                }.collect()
-        } catch (e: java.lang.Exception) {
-            exceptionRaised = true
+        val list = repo.getPokemonSummaryList().toList()
+        val emitedError = list.find {
+            it is OperationStatus.Error
         }
-
-        assert(exceptionRaised)
-
+        assert(emitedError != null)
     }
 }
 

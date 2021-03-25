@@ -2,15 +2,17 @@ package br.com.drss.pokedex.features.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.drss.pokedex.features.home.repository.Loading
+import br.com.drss.pokedex.features.home.repository.OperationStatus
 import br.com.drss.pokedex.features.home.repository.PokemonRepository
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonTypeFilter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@FlowPreview
 class PokemonListViewModel(
     private val pokemonRepository: PokemonRepository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
@@ -34,7 +36,7 @@ class PokemonListViewModel(
         viewModelScope.launch(dispatcher) {
             pokemonRepository.getPokemonSummaryList()
                 .onEach {
-                    mutableViewState.value = mutableViewState.value.copy(isFetchingItems = it is Loading)
+                    mutableViewState.value = mutableViewState.value.copy(isFetchingItems = it is OperationStatus.Loading)
                 }
                 .combine(visibleItemStateFlow) { data, visibleItem ->
                     mutableViewState.value = mutableViewState.value.copy(scrollToTopVisible = visibleItem > 0)
@@ -42,11 +44,7 @@ class PokemonListViewModel(
                 }
                 .debounce(500)
                 .combine(searchChannel) { data, filter ->
-                    if (filter.isEmpty()) {
-                        data.data
-                    } else {
-                        data.data.filter { it.name.contains(filter) }
-                    }
+                    data to filter
                 }
                 .catch {
                     viewEventsChannel.emit(PokemonListViewEvents.Error)
@@ -54,11 +52,24 @@ class PokemonListViewModel(
                 .onCompletion {
                     mutableViewState.value = mutableViewState.value.copy(isFetchingItems = false)
                 }
-                .collect {
-                    val currentState = mutableViewState.value
-                    mutableViewState.value = currentState.copy(
-                        pokemonSummaryList = it
-                    )
+                .collect { (operationStatus, filter) ->
+                    when (operationStatus) {
+                        is OperationStatus.Error ->  {
+                            if (operationStatus is Error) viewEventsChannel.emit(PokemonListViewEvents.Error)
+                        }
+                        is OperationStatus.Loaded,
+                        is OperationStatus.Loading -> {
+                            val list =
+                                if (operationStatus is OperationStatus.Loading)
+                                    operationStatus.intermediaryData
+                                else
+                                    (operationStatus as OperationStatus.Loaded).finalData
+                            val filteredList = list.filter {
+                                it.name.contains(filter)
+                            }
+                            mutableViewState.value = mutableViewState.value.copy(pokemonSummaryList = filteredList)
+                        }
+                    }
                 }
         }
     }

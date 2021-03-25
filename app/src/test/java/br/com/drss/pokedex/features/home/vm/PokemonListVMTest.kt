@@ -16,6 +16,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.lang.Exception
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
 class PokemonListVMTest {
@@ -30,9 +31,9 @@ class PokemonListVMTest {
                 pokemonList.forEach {
                     delay(10)
                     mutableList.add(it.toSummary())
-                    emit(Loading(mutableList.toList()))
+                    emit(OperationStatus.Loading(mutableList.toList()))
                 }
-                emit(Loaded(mutableList.toList()))
+                emit(OperationStatus.Loaded(mutableList.toList()))
             }
         }
     }

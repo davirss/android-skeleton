@@ -21,8 +21,10 @@ import br.com.drss.pokedex.databinding.FragmentPokemonListBinding
 import br.com.drss.pokedex.extensions.getInteger
 import br.com.drss.pokedex.features.home.ui.adapters.PokemonSummaryListAdapter
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.FlowPreview
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+@FlowPreview
 class PokemonListFragment : Fragment() {
 
     private lateinit var gridLayoutManager: GridLayoutManager
@@ -119,7 +121,8 @@ class PokemonListFragment : Fragment() {
             if (viewState.isFetchingItems) View.VISIBLE else View.GONE
 
         binding.pokemonListScrollToTop.apply {
-            if (visibility == View.VISIBLE && viewState.scrollToTopVisible) return@apply
+            val newVisibility = if (viewState.scrollToTopVisible) View.VISIBLE else View.GONE
+            if (newVisibility == visibility) return@apply
 
             val animationId = if (viewState.scrollToTopVisible) R.anim.anim_grow else R.anim.anim_shrink
             val growAnimation = AnimationUtils.loadAnimation(requireContext(), animationId)
