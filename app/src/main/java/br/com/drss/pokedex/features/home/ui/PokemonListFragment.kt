@@ -1,19 +1,15 @@
 package br.com.drss.pokedex.features.home.ui
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Fade
-import androidx.transition.Slide
 import br.com.drss.pokedex.MainActivity
 import br.com.drss.pokedex.NavigationActions
 import br.com.drss.pokedex.R
@@ -60,7 +56,7 @@ class PokemonListFragment : Fragment() {
         setupToolbar()
 
         binding.pokemonListScrollToTop.setOnClickListener {
-            pokemonListViewModel.scrollToTop()
+            pokemonListViewModel.onScrollToTop()
         }
     }
 

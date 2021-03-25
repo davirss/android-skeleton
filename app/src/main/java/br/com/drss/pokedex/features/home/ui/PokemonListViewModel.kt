@@ -6,11 +6,8 @@ import br.com.drss.pokedex.features.home.repository.OperationStatus
 import br.com.drss.pokedex.features.home.repository.PokemonRepository
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSummary
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonTypeFilter
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 @FlowPreview
 class PokemonListViewModel(
@@ -92,7 +89,7 @@ class PokemonListViewModel(
         }
     }
 
-    fun scrollToTop() {
+    fun onScrollToTop() {
         viewModelScope.launch(dispatcher) {
             viewEventsChannel.emit(PokemonListViewEvents.ScrollTop)
         }

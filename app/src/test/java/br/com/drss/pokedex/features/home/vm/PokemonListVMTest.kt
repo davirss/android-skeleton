@@ -6,16 +6,17 @@ import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonSumma
 import br.com.drss.pokedex.features.home.repository.domain.entities.PokemonType
 import br.com.drss.pokedex.features.home.ui.PokemonListViewEvents
 import br.com.drss.pokedex.features.home.ui.PokemonListViewModel
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.lang.Exception
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @FlowPreview
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
@@ -44,14 +45,11 @@ class PokemonListVMTest {
 
             val vm = PokemonListViewModel(FakePokeRepo(), dispatcher)
 
-            val firstState = vm.viewState.first()
-            assertEquals((firstState).isFetchingItems, true)
-
-            vm.viewState.collect {
-                if (!it.isFetchingItems) {
-                    assertEquals(pokemonList.size, it.pokemonSummaryList.size)
-                }
+            dispatcher.resumeDispatcher()
+            val viewState = vm.viewState.first {
+                !it.isFetchingItems
             }
+            assertEquals(pokemonList.size, viewState.pokemonSummaryList.size)
         }
 
     @Test
@@ -67,7 +65,7 @@ class PokemonListVMTest {
         dispatcher.pauseDispatcher()
         val viewModel = PokemonListViewModel(repo, dispatcher)
 
-        val deferred = async(Dispatchers.IO) {
+        val deferred = async {
             val event = viewModel.viewEvent.first()
             assert(event is PokemonListViewEvents.Error)
         }
@@ -79,32 +77,19 @@ class PokemonListVMTest {
     @Test
     fun `Given I have a pokemon list available When I select one of the Items Then I must display the details`(): Unit = runBlocking {
 
-        dispatcher.pauseDispatcher()
         val viewModel = PokemonListViewModel(FakePokeRepo(), dispatcher)
-
-        val deferred = async(Dispatchers.IO) {
-            val state = viewModel.viewState.first {
-                it.pokemonSummaryList.isNotEmpty()
-            }
-
-            launch(Dispatchers.IO) {
-                val event = viewModel.viewEvent.first()
-                assert(event is PokemonListViewEvents.Error)
-            }
-            viewModel.onItemSelected(state.pokemonSummaryList.first())
-        }
         dispatcher.resumeDispatcher()
-        deferred.await()
+        viewModel.onScrollToTop()
+        val event = viewModel.viewEvent.first()
+        assert(event is PokemonListViewEvents.ScrollTop)
     }
 
     @Test
     fun `Given the item position is not the first Then the scroll must be enabled `() = runBlocking {
         val viewModel = PokemonListViewModel(FakePokeRepo(), dispatcher)
-
+        dispatcher.resumeDispatcher()
         viewModel.setFirstVisibleItemPosition(10)
-        val viewState = viewModel.viewState.single()
-
+        val viewState = viewModel.viewState.first()
         assert(viewState.scrollToTopVisible)
-
     }
 }
