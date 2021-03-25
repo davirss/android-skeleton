@@ -6,11 +6,12 @@ import br.com.drss.pokedex.network.dtos.PokemonDto
 import br.com.drss.pokedex.network.dtos.Species
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PokeApi {
 
-    @GET("v2/pokemon?limit=1000")
-    suspend fun getPokemonPagedList(): PagedListResponse<PagedPokemonDto>
+    @GET("v2/pokemon")
+    suspend fun getPokemonPagedList(@Query("limit") limit: Int = 1180): PagedListResponse<PagedPokemonDto>
 
     @GET("v2/pokemon/{name}")
     suspend fun getPokemonData(@Path("name") name: String): PokemonDto

@@ -32,35 +32,52 @@ class PokemonRepositoryImpl(
     @ExperimentalCoroutinesApi
     override fun getPokemonSummaryList(typeFilters: List<PokemonType>): Flow<OperationStatus<List<PokemonSummary>>> =
         flow {
-
             val query =
                 if (typeFilters.isNotEmpty())
                     pokemonSummaryDao.getTypeFilteredSummaries(typeFilters)
                 else
                     pokemonSummaryDao.getAllSummaries()
 
-
-            val refreshCall = flow<Boolean> {
-                val pokemonList = pokemonApi.getPokemonPagedList()
-                emit(true)
-                pokemonList.results.map {
-                    try {
-                        getPokemonSummary(it.name, pokemonSummaryDao, pokemonApi)
-                    } catch (e: Exception) {
-                        Log.d("SUMMARY", "Failed to fetch pokemon")
-                    }
-                }
-                emit(false)
-            }
-
             query
-                .combine(refreshCall.catch { emit(false) }) { list, isLoading ->
-                    if (isLoading) Loading(list) else Loaded(list)
+                .combine(fetchMissingPokemon(pokemonApi)) { bdList, cacheRefreshingStatus ->
+                    if (cacheRefreshingStatus is OperationStatus.Error) {
+                        emit(cacheRefreshingStatus)
+                    }
+                    if (cacheRefreshingStatus is OperationStatus.Loading)
+                        OperationStatus.Loading(bdList)
+                    else
+                        OperationStatus.Loaded(bdList)
                 }
                 .collect { list ->
                     emit(list)
                 }
         }.flowOn(coroutineDispatcher)
+
+
+    /**
+     * Updates the local pokemon data source based on the list returned by the remote.
+     * Returns a flow containing the status of the operation.
+     *
+     * @param [remoteSource] the API that the pokemon list will be queried.
+     * @return [Flow] of [OperationStatus] without any data, only the state of the operation.
+     */
+    private fun fetchMissingPokemon(remoteSource: PokeApi): Flow<OperationStatus<*>> = flow<OperationStatus<Any>> {
+        val pokemonList = remoteSource.getPokemonPagedList()
+        pokemonList.results.forEach {
+            try {
+                getPokemonSummary(it.name, pokemonSummaryDao, remoteSource)
+            } catch (e: Exception) {
+                Log.d("SUMMARY", "Failed to fetch pokemon")
+            }
+        }
+        return@flow
+    }.onStart {
+        emit(OperationStatus.Loading(Any()))
+    }.onCompletion {
+        emit(OperationStatus.Loaded(Any()))
+    }.catch { cause ->
+        emit(OperationStatus.Error(cause as Exception))
+    }
 
 
     /**
@@ -91,9 +108,11 @@ class PokemonRepositoryImpl(
     }
 }
 
-sealed class OperationStatus<T>(val data: T)
-data class Loading<T>(val intermediaryData: T) : OperationStatus<T>(intermediaryData)
-data class Loaded<T>(val finalData: T) : OperationStatus<T>(finalData)
+sealed class OperationStatus<out T> {
+    data class Loading<T>(val intermediaryData: T) : OperationStatus<T>()
+    data class Loaded<T>(val finalData: T) : OperationStatus<T>()
+    data class Error(val exception: Exception) : OperationStatus<Nothing>()
+}
 
 internal fun PokemonDto.toSummary(): PokemonSummary {
     return PokemonSummary(
