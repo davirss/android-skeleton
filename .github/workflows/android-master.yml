@@ -1,0 +1,30 @@
+on: push
+
+jobs:
+  build-app:
+    name: Run app build
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - name: Build apk
+        run: bash ./gradlew assembleRelease
+      - name: Uploading artifact
+        if: contains(github.ref, 'main')
+        uses: actions/upload-artifact@v2
+        with:
+          path: app/build/**/release/*.apk
+          name: app ${{ github.run_number }}
+
+

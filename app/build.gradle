@@ -77,6 +77,8 @@ dependencies {
     kapt room_kapt
 
     testImplementation junit.junit
+    testImplementation 'app.cash.turbine:turbine:0.4.1'
+
     testImplementation kotlinx.coroutines_test
 
     androidTestImplementation androidx.test.values()
